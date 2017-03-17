@@ -2,7 +2,7 @@
   "name": "ticker-text",
   "version": "0.1.0",
   "description": "Calculates how long a string should stay visible using the characteristics of that string, corresponding millisecond values, and other data",
-  "main": "main.js",
+  "main": "ticker-text.js",
   "scripts": {},
   "repository": {
     "type": "git",
@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/knod/ticker-text/issues"
   },
-  "homepage": "https://github.com/knod/ticker-text#readme"
+  "homepage": "https://github.com/knod/ticker-text#readme",
+  "devDependencies": {
+    "jasmine": "^2.5.3"
+  }
 }
