@@ -1,8 +1,8 @@
 {
   "name": "ticker-text",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Calculates how long a string should stay visible using the characteristics of that string, corresponding millisecond values, and other data",
-  "main": "ticker-text.js",
+  "main": "Ticker-Text.js",
   "scripts": {},
   "repository": {
     "type": "git",
