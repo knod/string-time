@@ -13,11 +13,7 @@ describe( "TickerText,", function () {
 
 		var tt 		 = new TT(),
 			defaults = tt.calcDelay( 'abcd' );
-
-
-		beforeEach(function() {
-			tt.resetSlowStart();
-		});
+		beforeEach(function() { tt.resetSlowStart(); });
 
 
 		// --- Basics --- \\
@@ -113,149 +109,177 @@ describe( "TickerText,", function () {
 		// --- Expected Instance Values --- \\
 		describe( ", given a string with these modifying characteristics:", function () {
 			
+			var ms;
+
+			// ---- Nothing Special ----
 			describe( "none,", function () {
-				it( "should return 800.", function () {
-					expect( defaults ).toEqual( 800 );
+				beforeEach(function() { ms = 800 });
+				it( "should return " + ms + ".", function () {
+					expect( defaults ).toEqual( ms );
 				});
 			});
 			
+			// ---- Short Word ----
 			describe( "less than 3 characters,", function () {
 
-				var val = 'ab';
+				beforeEach(function() { ms = 1040 });
+
 				// expect( function() {return val < 3} ).toEqual( true );  // Testing test
-				it( "should return 1040.", function () {
-					expect( tt.calcDelay( val ) ).toEqual( 1040 );
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay( 'ab' ) ).toEqual( ms );
 				});
 
-				val = 'a';
 				// expect( function() {return val < 3} ).toEqual( true );  // Testing test
-				it( "should return 1040.", function () {
-					expect( tt.calcDelay( val ) ).toEqual( 1040 );
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay( 'a' ) ).toEqual( ms );
 				});
 
+				// expect( function() {return val < 3} ).toEqual( true );  // Testing test
 				// ??: Should return 0?
-				val = '';
-				// expect( function() {return val < 3} ).toEqual( true );  // Testing test
-				it( "should return 1040.", function () {
-					expect( tt.calcDelay( val ) ).toEqual( 1040 );
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay( '' ) ).toEqual( ms );
 				});
 
 			});  // End < 3 characters
 			
+			// ---- Long Word ----
 			describe( "more than 8 characters,", function () {
-				it( "should return 1200.", function () {
-					expect( tt.calcDelay('abcdabcda') ).toEqual( 1200 );
+				beforeEach(function() { ms = 1200 });
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay('abcdabcda') ).toEqual( ms );
 				});
 			});  // End > 8 characters
 
+			// ---- Sentence-ender Punctuation ----
 			describe( "one or more of '.', '!', and/or '?' ,", function () {
+				
+				beforeEach(function() { ms = 4000 });
 
-				it( "should return 4000.", function () {
-					expect( tt.calcDelay( 'abcd.' ) ).toEqual( 4000 );
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay( 'abcd.' ) ).toEqual( ms );
 				});
 
-				it( "should return 4000.", function () {
-					expect( tt.calcDelay( 'abc.d..' ) ).toEqual( 4000 );
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay( 'abc.d..' ) ).toEqual( ms );
 				});
 
-				it( "should return 4000.", function () {
-					expect( tt.calcDelay( 'abc.d.!' ) ).toEqual( 4000 );
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay( 'abc.d.!' ) ).toEqual( ms );
 				});
 
-				it( "should return 4000.", function () {
-					expect( tt.calcDelay( 'abc.d.?' ) ).toEqual( 4000 );
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay( 'abc.d.?' ) ).toEqual( ms );
 				});
 
 			});  // End sentence
 
-			// describe( "one or more non-sentence-ending punctuation character ,", function () {
-			describe( "one or more '\"'", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd"' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( '"abcd"' ) ).toEqual( 2000 );
-				});
-			});
+			// ---- Other Punctuation ----
+			describe( "(other punctuation)", function () {
+				
+				beforeEach(function() { ms = 2000 });
 
-			describe( "one or more \"'\"'", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( "abcd'" ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( "'abcd'" ) ).toEqual( 2000 );
+				describe( "one or more '\"'", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd"' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( '"abcd"' ) ).toEqual( ms );
+					});
 				});
-			});
 
-			describe( "one or more '”'", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd”' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( '”abcd”' ) ).toEqual( 2000 );
+				describe( "one or more \"'\"'", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( "abcd'" ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( "'abcd'" ) ).toEqual( ms );
+					});
 				});
-			});
 
-			describe( "one or more '’'", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd’' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( '’abcd’' ) ).toEqual( 2000 );
+				describe( "one or more '”'", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd”' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( '”abcd”' ) ).toEqual( ms );
+					});
 				});
-			});
 
-			describe( "one or more '('", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd(' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( '(abcd(' ) ).toEqual( 2000 );
+				describe( "one or more '’'", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd’' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( '’abcd’' ) ).toEqual( ms );
+					});
 				});
-			});
 
-			describe( "one or more ')'", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd)' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( ')abcd)' ) ).toEqual( 2000 );
+				describe( "one or more '('", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd(' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( '(abcd(' ) ).toEqual( ms );
+					});
 				});
-			});
 
-			describe( "one or more ':'", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd:' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( ':abcd:' ) ).toEqual( 2000 );
+				describe( "one or more ')'", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd)' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( ')abcd)' ) ).toEqual( ms );
+					});
 				});
-			});
 
-			describe( "one or more ';'", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd;' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( ';abcd;' ) ).toEqual( 2000 );
+				describe( "one or more ':'", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd:' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( ':abcd:' ) ).toEqual( ms );
+					});
 				});
-			});
 
-			describe( "one or more ','", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd,' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( ',abcd,' ) ).toEqual( 2000 );
+				describe( "one or more ';'", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd;' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( ';abcd;' ) ).toEqual( ms );
+					});
 				});
-			});
 
-			describe( "one or more '_'", function () {
-				it( "should return 2000.", function () {
-					expect( tt.calcDelay( 'abcd_' ) ).toEqual( 2000 );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( '_abcd_' ) ).toEqual( 2000 );
+				describe( "one or more ','", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd,' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( ',abcd,' ) ).toEqual( ms );
+					});
 				});
-			});
+
+				describe( "one or more '_'", function () {
+					it( "should return " + ms + ".", function () {
+						expect( tt.calcDelay( 'abcd_' ) ).toEqual( ms );
+						tt.resetSlowStart();
+						expect( tt.calcDelay( '_abcd_' ) ).toEqual( ms );
+					});
+				});
 
 			// TODO: Add more punctuation and more cases
-			// End non-sentence ending punctuation
+			});  // End non-sentence ending punctuation
+
+
+			// ---- Numerical ----
+
+			// ---- Combos of characteristics ----
+
+			// ---- Unexpected Values ----
 
 
 		});  // End string characteristics
 
-	});  // End expected instance values
+		// ---- Just Once ----
+			// ---- Expected Values ----
+			// ---- Unexpected Values ----
+
+	});  // End no-argument constructor
+
+
+	// ---- Custom Settings ----
+		// ---- That Change ----
 
 });  // End hyperaxe
 
