@@ -81,6 +81,7 @@
 		var _setts 			= null;
 		tktx._tempSlowStart = null;
 
+		// TODO: Rename 'slowStartDelay' to 'warmupDelay'
 		var toMultiplyBy = tktx._toMultiplyBy = {
 			'hasPeriod': 	'sentenceDelay',
 			'hasOtherPunc': 'otherPuncDelay',
