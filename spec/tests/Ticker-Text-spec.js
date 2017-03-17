@@ -2,6 +2,14 @@ describe( "TickerText,", function () {
 
 	var TT = require('../../dist/Ticker-Text.js');
 
+	var tt;
+	beforeEach(function() { tt = new TT() });
+
+
+	// ======== !!! NOTE !!! ========
+	// If `.defaults` are changed, these results are going to change...
+
+
 
 	// ======== UNEXPECTED VALUES ========
 
@@ -10,20 +18,14 @@ describe( "TickerText,", function () {
 	// ======== EXPECTED VALUES ========
 	describe( "when called without an argument, its instance", function () {
 
-
-		var tt 		 = new TT(),
-			defaults = tt.calcDelay( 'abcd' );
-		beforeEach(function() { tt.resetSlowStart(); });
-
-
 		// --- Basics --- \\
 		it( "should return a number.", function () {
-			expect( typeof defaults ).toEqual( 'number' );
+			expect( typeof tt.calcDelay( 'abcd' ) ).toEqual( 'number' );
 		});
 
 		it( "should use its default settings.", function () {
 			expect( tt._settings ).toBe( tt.defaults );
-			expect( defaults ).toEqual( 800 );
+			expect( tt.calcDelay( 'abcd' ) ).toEqual( 800 );
 		});
 
 		it( "should start with a `._tempSlowStart` value equal to its `.defaults.slowStartDelay`.", function () {
@@ -58,16 +60,18 @@ describe( "TickerText,", function () {
 
 		});
 
-		describe( ", when its .resetSlowStart() method is used,", function () {
-
-			var one = tt.calcDelay( 'abcd' ),
-				two = tt.calcDelay( 'abcd' ),
-				reset = tt.resetSlowStart(),
-				three = tt.calcDelay( 'abcd' );
+		describe( ", when its `.resetSlowStart()` method is used,", function () {
 
 			it( "should refresh the slow start delay value.", function () {
+
+				var one = tt.calcDelay( 'abcd' ),
+					two = tt.calcDelay( 'abcd' ),
+					reset = tt.resetSlowStart();
 				expect( tt._tempSlowStart ).toEqual( tt.defaults.slowStartDelay );
+
+				var three = three = tt.calcDelay( 'abcd' )
 				expect( three ).toEqual(800)
+
 			});
 
 		});
@@ -115,7 +119,7 @@ describe( "TickerText,", function () {
 			describe( "none,", function () {
 				beforeEach(function() { ms = 800 });
 				it( "should return " + ms + ".", function () {
-					expect( defaults ).toEqual( ms );
+					expect( tt.calcDelay( 'abcd' ) ).toEqual( ms );
 				});
 			});
 			
