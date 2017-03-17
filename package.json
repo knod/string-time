@@ -1,0 +1,27 @@
+{
+  "name": "ticker-text",
+  "version": "0.1.0",
+  "description": "Calculates how long a string should stay visible using the characteristics of that string, corresponding millisecond values, and other data",
+  "main": "main.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knod/ticker-text.git"
+  },
+  "keywords": [
+    "accessibility",
+    "readerly",
+    "rsvp",
+    "timer",
+    "delay",
+    "timeout",
+    "string",
+    "text"
+  ],
+  "author": "knod",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knod/ticker-text/issues"
+  },
+  "homepage": "https://github.com/knod/ticker-text#readme"
+}
