@@ -115,6 +115,29 @@
 
 		// ============== RUNTIME ============== \\
 
+		tktx.orDefault = function ( propName ) {
+		/* ( str ) -> Number
+		* 
+		* Determines whether to use a setting that's handed in
+		* or a default one, throwing an error if necessary
+		*/
+			var val = null;
+
+			if ( _setts && _sett[ propName ] ) {
+
+				var val = _sett[ propName ];
+				if ( typeof val !== 'number' || isNaN(val) || val < 0 ) {
+					throw new TypeError( "The settings value '" + delayModKey + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + mod );
+				}
+
+			} else {
+				val = defaults[ propName ];
+			}
+
+			return val;
+		};  // End tktx.orDefault()
+
+
 		tktx.calcDelay = function ( str, justOnce ) {
 		/* ( str, [bool] ) -> Float
 		* 
@@ -123,16 +146,21 @@
 			// TODO: ??: Always reset slowStart when justOnce
 			// === true?
 
+			if ( typeof str !== 'string' ) {
+				throw new TypeError( 'The first argument to `.calcDelay` was not a string. What you sent:', str )
+			}
+			if ( justOnce !== undefined && typeof justOnce !== 'boolean' ) {
+				throw new TypeError( 'The optional second argument to `.calcDelay` was not undefined or a boolean. What you sent:', justOnce )
+			}
+
 			var processed = tktx._process( str );
 
-			var delay = _setts._baseDelay;
+			var delay = tktx.orDefault( '_baseDelay' );
 
 			for ( let key in toMultiplyBy ) {
 				if ( processed[ key ] ) {
-
-					var delayModKey = toMultiplyBy[ key ]
-					delay *= _setts[ delayModKey ] || defaults[ delayModKey ];
-
+					var delayModKey = toMultiplyBy[ key ];
+					delay *= tktx.orDefault( delayModKey );
 				}
 			}
 
@@ -158,7 +186,7 @@
 		* text off slowly to warm the reader up to full speed.
 		*/
 			if ( val ) { tktx._tempSlowStart = val; }
-			else { tktx._tempSlowStart = _setts.slowStartDelay; }
+			else { tktx._tempSlowStart = tktx.orDefault( 'slowStartDelay' ); }
 			return tktx;
 		};
 
@@ -175,7 +203,7 @@
 	        tktx._setPuncProps( result );
 
 			// TODO: Get from custom user settings
-			// TODO: ??: Convert to array of lengths?
+			// TODO: ??: Transition to array of lengths?
 			var shortLength = 2,
 				longLength 	= 8;
 
@@ -207,8 +235,8 @@
 		// ======= SET STARTING VALUES ======== \\
 
 		tktx._init = function ( settings ) {
-			_setts = tktx._settings = settings || defaults;
-			tktx.resetSlowStart();
+			_setts = tktx._settings = settings;
+			tktx.resetSlowStart();  // Start at default warmup setting
 			return tktx;
 		}
 

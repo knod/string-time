@@ -1,4 +1,4 @@
-describe( "TickerText,", function () {
+describe( "When a TickerText instance is created,", function () {
 
 	var TT = require('../../dist/Ticker-Text.js');
 
@@ -6,17 +6,13 @@ describe( "TickerText,", function () {
 	beforeEach(function() { tt = new TT() });
 
 
-	// ======== !!! NOTE !!! ========
+	// ======== !!! NOTE !!! ======== \\
 	// If `.defaults` are changed, these results are going to change...
 
 
 
-	// ======== UNEXPECTED VALUES ========
-
-
-
-	// ======== EXPECTED VALUES ========
-	describe( "when called without an argument, its instance", function () {
+	// ======== NO CONSTRUCTOR ARGUMENTS ======== \\
+	describe( "without an argument, that instance's `.calcDelay()`", function () {
 
 		// --- Basics --- \\
 		it( "should return a number.", function () {
@@ -24,7 +20,17 @@ describe( "TickerText,", function () {
 		});
 
 		it( "should use its default settings.", function () {
-			expect( tt._settings ).toBe( tt.defaults );
+			var defs = {
+				wpm: 			250,
+				_baseDelay: 	1/(250/60)*1000,
+				slowStartDelay: 5,
+				sentenceDelay: 	5,
+				otherPuncDelay: 2.5,
+				numericDelay: 	2.0,
+				shortWordDelay: 1.3,
+				longWordDelay: 	1.5,
+			};
+			expect( tt.defaults ).toEqual( defs );
 			expect( tt.calcDelay( 'abcd' ) ).toEqual( 800 );
 		});
 
@@ -76,46 +82,13 @@ describe( "TickerText,", function () {
 
 		});
 
-		// TODO: ??: Throw a bad value/type error if the second argument is not a bool or undefined??
-		// TODO: ??: Only check for 'true'??
-		describe( ", when it's called with `false` as the second argument", function () {
-			it( "SHOULD reduce its `._tempSlowStart` value", function () {
-
-				var start = tt._tempSlowStart;
-				tt.calcDelay( 'abcd', false );
-				expect( tt._tempSlowStart ).toEqual( start/1.5 );
-
-			});
-		});
-
-		// TODO: Throw a bad value/type error if the second argument is not a bool or undefined
-		describe( ", when it's called WITHOUT a second argument", function () {
-			it( "SHOULD reduce its `._tempSlowStart` value", function () {
-
-				var start = tt._tempSlowStart;
-				tt.calcDelay( 'abcd' );
-				expect( tt._tempSlowStart ).toEqual( start/1.5 );
-
-			});
-		});
-
-		describe( ", when it's called WITH `true` as the second argument", function () {
-			it( "should NOT reduce its `._tempSlowStart` value", function () {
-
-				var start = tt._tempSlowStart;
-				tt.calcDelay( 'abcd', true );
-				expect( tt._tempSlowStart ).toEqual( start );
-
-			});
-		});
-
 
 		// --- Expected Instance Values --- \\
 		describe( ", given a string with these modifying characteristics:", function () {
 			
 			var ms;
 
-			// ---- Nothing Special ----
+			// ---- Nothing Special ---- \\
 			describe( "none,", function () {
 				beforeEach(function() { ms = 800 });
 				it( "should return " + ms + ".", function () {
@@ -123,7 +96,7 @@ describe( "TickerText,", function () {
 				});
 			});
 			
-			// ---- Short Word ----
+			// ---- Short Word ---- \\
 			describe( "less than 3 characters,", function () {
 
 				beforeEach(function() { ms = 1040 });
@@ -146,15 +119,15 @@ describe( "TickerText,", function () {
 
 			});  // End < 3 characters
 			
-			// ---- Long Word ----
+			// ---- Long Word ---- \\
 			describe( "more than 8 characters,", function () {
 				beforeEach(function() { ms = 1200 });
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay('abcdabcda') ).toEqual( ms );
+					expect( tt.calcDelay( 'abcdabcda' ) ).toEqual( ms );
 				});
 			});  // End > 8 characters
 
-			// ---- Sentence-ender Punctuation ----
+			// ---- Sentence-ender Punctuation ---- \\
 			describe( "one or more of '.', '!', and/or '?' ,", function () {
 				
 				beforeEach(function() { ms = 4000 });
@@ -177,7 +150,7 @@ describe( "TickerText,", function () {
 
 			});  // End sentence
 
-			// ---- Other Punctuation ----
+			// ---- Other Punctuation ---- \\
 			describe( "(other punctuation)", function () {
 				
 				beforeEach(function() { ms = 2000 });
@@ -265,25 +238,164 @@ describe( "TickerText,", function () {
 			// TODO: Add more punctuation and more cases
 			});  // End non-sentence ending punctuation
 
+			// ---- Numerical ---- \\
+			describe( "any numerical characters,", function () {
 
-			// ---- Numerical ----
+				beforeEach(function() { ms = 1600 });
+				it( "should return " + ms + ".", function () {
+					expect( tt.calcDelay( '12345' ) ).toEqual( ms );
+					tt.resetSlowStart();
+					expect( tt.calcDelay( 'ab345' ) ).toEqual( ms );
+					tt.resetSlowStart();
+					expect( tt.calcDelay( '123de' ) ).toEqual( ms );
+					tt.resetSlowStart();
+					expect( tt.calcDelay( '12cd5' ) ).toEqual( ms );
+				});
 
-			// ---- Combos of characteristics ----
+			});  // End numerical characters
 
-			// ---- Unexpected Values ----
+			// ---- Combos of characteristics ---- \\
 
 
 		});  // End string characteristics
 
-		// ---- Just Once ----
-			// ---- Expected Values ----
-			// ---- Unexpected Values ----
+
+		// ============= ERRORS ============= \\
+		// ---- Unexpected Values For First Argument ---- \\
+		describe( ", when given no first argument", function () {
+			it( "should throw a TypyError.", function () {
+				expect( function(){ return tt.calcDelay() } ).toThrowError( TypeError, /first/ )
+			});
+		});
+
+		describe( ", when given `null` as a first argument", function () {
+			it( "should throw a TypyError.", function () {
+				expect( function(){ return tt.calcDelay( null ) } ).toThrowError( TypeError, /first/ )
+			});
+		});
+
+		describe( ", when given `true` as a first argument", function () {
+			it( "should throw a TypyError.", function () {
+				expect( function(){ return tt.calcDelay( true ) } ).toThrowError( TypeError, /first/ )
+			});
+		});
+
+		describe( ", when given `false` as a first argument", function () {
+			it( "should throw a TypyError.", function () {
+				expect( function(){ return tt.calcDelay( false ) } ).toThrowError( TypeError, /first/ )
+			});
+		});
+
+		describe( ", when given an object as a first argument", function () {
+			it( "should throw a TypyError.", function () {
+				expect( function(){ return tt.calcDelay( {} ) } ).toThrowError( TypeError, /first/ )
+			});
+		});
+
+		describe( ", when given an empty array as a first argument", function () {
+			it( "should throw a TypyError.", function () {
+				expect( function(){ return tt.calcDelay( [] ) } ).toThrowError( TypeError, /first/ )
+			});
+		});
+
+		describe( ", when given an array as a first argument", function () {
+			it( "should throw a TypyError.", function () {
+				expect( function(){ return tt.calcDelay( [1, 2, 3] ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return tt.calcDelay( ['1', '2', '3'] ) } ).toThrowError( TypeError, /first/ )
+			});
+		});
+
+		describe( ", when given a number as a first argument", function () {
+			it( "should throw a TypyError.", function () {
+				expect( function(){ return tt.calcDelay( 0 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return tt.calcDelay( 1 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return tt.calcDelay( 5 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return tt.calcDelay( -1 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return tt.calcDelay( 0.1 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return tt.calcDelay( -0.1 ) } ).toThrowError( TypeError, /first/ )
+			});
+		});
+
+		// ---- justOnce, Expected Values ---- \\
+
+		// TODO: Throw a bad value/type error if the second argument is not a bool or undefined
+		describe( ", when given NOTHING as a second argument", function () {
+			it( "SHOULD reduce its `._tempSlowStart` value", function () {
+
+				var start = tt._tempSlowStart;
+				tt.calcDelay( 'abcd' );
+				expect( tt._tempSlowStart ).toEqual( start/1.5 );
+
+			});
+		});
+
+		describe( ", when given `true` as a second argument", function () {
+			it( "should not decrease its `._tempSlowStart`", function () {
+
+				var start = tt._tempSlowStart;
+				tt.calcDelay( 'abcd', true );
+				expect( tt._tempSlowStart ).toEqual( start );
+
+			});
+		});
+
+		// TODO: ??: Throw a bad value/type error if the second argument is not a bool or undefined??
+		// TODO: ??: Only check for 'true'??
+		describe( ", when given `false` as the second argument", function () {
+			it( "SHOULD reduce its `._tempSlowStart` value", function () {
+
+				var start = tt._tempSlowStart;
+				tt.calcDelay( 'abcd', false );
+				expect( tt._tempSlowStart ).toEqual( start/1.5 );
+
+			});
+		});
+
+		// ---- justOnce, Unexpected Values ---- \\
+
+		describe( "should give a TypeError", function () {
+
+			it( "when given `null` as a second argument", function () {
+				expect( function(){ return tt.calcDelay( 'abcd', null ) } ).toThrowError( TypeError, /second/ )
+			});
+
+			it( "when given an object as a second argument", function () {
+				expect( function(){ return tt.calcDelay( 'abcd', {} ) } ).toThrowError( TypeError, /second/ )
+			});
+
+			it( "when given an empty array as a second argument", function () {
+				expect( function(){ return tt.calcDelay( 'abcd', [] ) } ).toThrowError( TypeError, /second/ )
+			});
+
+			it( "when given an array as a second argument", function () {
+				expect( function(){ return tt.calcDelay( 'abcd', [1, 2, 3] ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', ['1', '2', '3'] ) } ).toThrowError( TypeError, /second/ )
+			});
+
+			it( "when given a number as a second argument", function () {
+				expect( function(){ return tt.calcDelay( 'abcd', 0 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', 1 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', 5 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', -1 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', 0.1 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', -0.1 ) } ).toThrowError( TypeError, /second/ )
+			});
+
+			it( "when given a string as a second argument", function () {
+				expect( function(){ return tt.calcDelay( 'abcd', '0' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', '1' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', 'abcd' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', '' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return tt.calcDelay( 'abcd', '#*' ) } ).toThrowError( TypeError, /second/ )
+			});
+
+		});  // End justOnce TypeError
 
 	});  // End no-argument constructor
 
 
-	// ---- Custom Settings ----
-		// ---- That Change ----
+	// ---- Custom Settings ---- \\
+		// ---- That Change ---- \\
 
 });  // End hyperaxe
 
