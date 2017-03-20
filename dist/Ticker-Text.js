@@ -102,6 +102,9 @@
 		};
 
 
+		var oldStart = defaults.slowStartDelay;
+
+
 		// ============== HOOKS ============== \\
 
 		// // TODO: Switch to system of each property name having a corresponding function
@@ -115,6 +118,8 @@
 
 		// ============== RUNTIME ============== \\
 
+		// --- Timing --- \\
+
 		tktx.orDefault = function ( propName ) {
 		/* ( str ) -> Number
 		* 
@@ -123,9 +128,9 @@
 		*/
 			var val = null;
 
-			if ( _setts && _sett[ propName ] ) {
+			if ( _setts && _setts[ propName ] ) {
 
-				var val = _sett[ propName ];
+				var val = _setts[ propName ];
 				if ( typeof val !== 'number' || isNaN(val) || val < 0 ) {
 					throw new TypeError( "The settings value '" + delayModKey + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + mod );
 				}
@@ -164,6 +169,11 @@
 				}
 			}
 
+			// Otherwise, in some situations, we won't notice if slow start needs to change
+			// TODO: ??: Keep this on the curve of the change, so don't completely reset??
+			var nowStart = tktx.orDefault( 'slowStartDelay' );
+			if ( oldStart !== nowStart  ) { tktx.resetSlowStart(); }
+
 			// Just after starting up again, go slowly, then speed up a bit
 			// each time the loop is called, eating away at this number
 			var extraDelay = tktx._tempSlowStart;
@@ -185,13 +195,15 @@
 		* For after restart or pause, assign a value to start the
 		* text off slowly to warm the reader up to full speed.
 		*/
-			if ( val ) { tktx._tempSlowStart = val; }
-			else { tktx._tempSlowStart = tktx.orDefault( 'slowStartDelay' ); }
+			if ( val ) { tktx._tempSlowStart = val; }  // What happens to the custom settings here?
+			else {
+				oldStart = tktx._tempSlowStart = tktx.orDefault( 'slowStartDelay' );
+			}
 			return tktx;
 		};
 
 
-		// - Processing String - \\
+		// --- Processing String --- \\
 
 		tktx._process = function ( chars ) {
 		/* ( str ) -> {}
@@ -244,7 +256,7 @@
 		tktx._init( settings );
 
 		return tktx;
-	};  // End Delay() -> {}
+	};  // End TickerText() -> {}
 
     return TickerText;
 }));
