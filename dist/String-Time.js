@@ -1,4 +1,4 @@
-/* Ticker-Text.js
+/* String-Time.js
 * 
 * A constructor for an object that can return a float.
 *
@@ -6,7 +6,7 @@
 * object is tricky, and very tangled up with the code
 * that creates and uses it.
 * 
-* The creator of a TickerText instance (tt) passes in a
+* The creator of a StringTime instance (tt) passes in a
 * reference to an object which contains a `._settings`
 * property, which itself must contain these properties:
 * 
@@ -27,7 +27,7 @@
 * milliseconds a string should be displayed in the RSVP
 * app.
 * 
-* TickerText depends `state`'s properties repeatedly, so
+* StringTime depends `state`'s properties repeatedly, so
 * they can't be destroyed.
 * 
 * There are two other important features.
@@ -54,35 +54,35 @@
 * does need some persistence for `._tempSlowStart`
 */
 
-(function (root, tickerFactory) {  // root is usually `window`
+(function (root, timeFactory) {  // root is usually `window`
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define( [], function () {
-        	return ( root.TickerText = tickerFactory() );
+        	return ( root.StringTime = timeFactory() );
         });
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but only CommonJS-like
         // environments that support module.exports, like Node.
-        module.exports = tickerFactory();
+        module.exports = timeFactory();
     } else {
         // Browser globals
-        root.TickerText = tickerFactory();
+        root.StringTime = timeFactory();
     }
 }(this, function () {
 
 	"use strict";
 
-	var TickerText = function ( settings ) {
-	/* ( {} ) -> TickerText
+	var StringTime = function ( settings ) {
+	/* ( {} ) -> StringTime
 	* 
 	*/
-		var tktx = {};
+		var stm = {};
 
 		var _setts 			= null;
-		tktx._tempSlowStart = null;
+		stm._tempSlowStart = null;
 
 		// TODO: Rename 'slowStartDelay' to 'warmupDelay'
-		var toMultiplyBy = tktx._toMultiplyBy = {
+		var toMultiplyBy = stm._toMultiplyBy = {
 			'hasPeriod': 	'sentenceDelay',
 			'hasOtherPunc': 'otherPuncDelay',
 			'isShort': 		'shortWordDelay',
@@ -90,7 +90,7 @@
 			'isNumeric': 	'numericDelay'
 		}
 
-		var defaults = tktx.defaults = {
+		var defaults = stm.defaults = {
 			wpm: 			250,
 			_baseDelay: 	1/(250/60)*1000,  // based on wpm
 			slowStartDelay: 5,
@@ -108,7 +108,7 @@
 		// ============== HOOKS ============== \\
 
 		// // TODO: Switch to system of each property name having a corresponding function
-		// tktx.set = function ( obj ) {
+		// stm.set = function ( obj ) {
 		// // // `obj` consists of a function to check the string's properties,
 		// // // that function's name, a delay value, and a name for that value
 		// // 	toMultiplyBy[ obj.funcName ] = obj.delayName;
@@ -120,7 +120,7 @@
 
 		// --- Timing --- \\
 
-		tktx.orDefault = function ( propName ) {
+		stm.orDefault = function ( propName ) {
 		/* ( str ) -> Number
 		* 
 		* Determines whether to use a setting that's handed in
@@ -140,10 +140,10 @@
 			}
 
 			return val;
-		};  // End tktx.orDefault()
+		};  // End stm.orDefault()
 
 
-		tktx.calcDelay = function ( str, justOnce ) {
+		stm.calcDelay = function ( str, justOnce ) {
 		/* ( str, [bool] ) -> Float
 		* 
 		*/
@@ -158,61 +158,61 @@
 				throw new TypeError( 'The optional second argument to `.calcDelay` was not undefined or a boolean. What you sent:', justOnce )
 			}
 
-			var processed = tktx._process( str );
+			var processed = stm._process( str );
 
-			var delay = tktx.orDefault( '_baseDelay' );
+			var delay = stm.orDefault( '_baseDelay' );
 
 			for ( let key in toMultiplyBy ) {
 				if ( processed[ key ] ) {
 					var delayModKey = toMultiplyBy[ key ];
-					delay *= tktx.orDefault( delayModKey );
+					delay *= stm.orDefault( delayModKey );
 				}
 			}
 
 			// Otherwise, in some situations, we won't notice if slow start needs to change
 			// TODO: ??: Keep this on the curve of the change, so don't completely reset??
-			var nowStart = tktx.orDefault( 'slowStartDelay' );
-			if ( oldStart !== nowStart  ) { tktx.resetSlowStart(); }
+			var nowStart = stm.orDefault( 'slowStartDelay' );
+			if ( oldStart !== nowStart  ) { stm.resetSlowStart(); }
 
 			// Just after starting up again, go slowly, then speed up a bit
 			// each time the loop is called, eating away at this number
-			var extraDelay = tktx._tempSlowStart;
+			var extraDelay = stm._tempSlowStart;
 			// Make sure ._tempSlowStart isn't used up by things like .once()
 			// called repeatedly, like when the scrubber is moved.
 			// Reduce ._tempSlowStart a bit each time
 			// TODO: Make this customizable
-			if (!justOnce) {tktx._tempSlowStart = Math.max( 1, extraDelay / 1.5 );}
+			if (!justOnce) {stm._tempSlowStart = Math.max( 1, extraDelay / 1.5 );}
 
-			delay = delay * tktx._tempSlowStart;
+			delay = delay * stm._tempSlowStart;
 
 			return delay;
-		};  // End tktx.calcDelay()
+		};  // End stm.calcDelay()
 
 
-		tktx.resetSlowStart = function ( val ) {
-		/* ( num ) -> TickerText
+		stm.resetSlowStart = function ( val ) {
+		/* ( num ) -> StringTime
 		* 
 		* For after restart or pause, assign a value to start the
 		* text off slowly to warm the reader up to full speed.
 		*/
-			if ( val ) { tktx._tempSlowStart = val; }  // What happens to the custom settings here?
+			if ( val ) { stm._tempSlowStart = val; }  // What happens to the custom settings here?
 			else {
-				oldStart = tktx._tempSlowStart = tktx.orDefault( 'slowStartDelay' );
+				oldStart = stm._tempSlowStart = stm.orDefault( 'slowStartDelay' );
 			}
-			return tktx;
+			return stm;
 		};
 
 
 		// --- Processing String --- \\
 
-		tktx._process = function ( chars ) {
+		stm._process = function ( chars ) {
 		/* ( str ) -> {}
 		* 
 		* Assesses the properties of a string, saving them in an object
 		*/
 			var result = { chars: chars };
 
-	        tktx._setPuncProps( result );
+	        stm._setPuncProps( result );
 
 			// TODO: Get from custom user settings
 			// TODO: ??: Transition to array of lengths?
@@ -225,10 +225,10 @@
 			result.isNumeric = /\d/.test(chars);
 
 			return result;
-		};  // End tktx._process()
+		};  // End stm._process()
 
 
-		tktx._setPuncProps = function ( obj ) {
+		stm._setPuncProps = function ( obj ) {
 		/* ( str ) -> {}
 		* 
 		* Tests and sets the punctuation properties
@@ -239,25 +239,25 @@
 			obj.hasPeriod 	 = /[.!?]/.test(str);
 			obj.hasOtherPunc = /["'()”’:;,_]/.test(str);
 
-			return tktx;
-		};  // End tktx._setPuncProps()
+			return stm;
+		};  // End stm._setPuncProps()
 
 
 
 		// ======= SET STARTING VALUES ======== \\
 
-		tktx._init = function ( settings ) {
-			_setts = tktx._settings = settings;
-			tktx.resetSlowStart();  // Start at default warmup setting
-			return tktx;
+		stm._init = function ( settings ) {
+			_setts = stm._settings = settings;
+			stm.resetSlowStart();  // Start at default warmup setting
+			return stm;
 		}
 
 
-		tktx._init( settings );
+		stm._init( settings );
 
-		return tktx;
-	};  // End TickerText() -> {}
+		return stm;
+	};  // End StringTime() -> {}
 
-    return TickerText;
+    return StringTime;
 }));
 

@@ -1,9 +1,9 @@
-describe( "When a TickerText instance is created,", function () {
+describe( "When a StringTime instance is created,", function () {
 
-	var TT = require('../../dist/Ticker-Text.js');
+	var StringTime = require('../../dist/String-Time.js');
 
-	var tt;
-	beforeEach(function() { tt = new TT() });
+	var stm;
+	beforeEach(function() { stm = new StringTime() });
 
 
 	// ======== !!! NOTE !!! ======== \\
@@ -16,7 +16,7 @@ describe( "When a TickerText instance is created,", function () {
 
 		// --- Basics --- \\
 		it( "should return a number.", function () {
-			expect( typeof tt.calcDelay( 'abcd' ) ).toEqual( 'number' );
+			expect( typeof stm.calcDelay( 'abcd' ) ).toEqual( 'number' );
 		});
 
 		it( "should use its default settings.", function () {
@@ -30,37 +30,37 @@ describe( "When a TickerText instance is created,", function () {
 				shortWordDelay: 1.3,
 				longWordDelay: 	1.5,
 			};
-			expect( tt.defaults ).toEqual( defs );
-			expect( tt.calcDelay( 'abcd' ) ).toEqual( 800 );
+			expect( stm.defaults ).toEqual( defs );
+			expect( stm.calcDelay( 'abcd' ) ).toEqual( 800 );
 		});
 
 		it( "should start with a `._tempSlowStart` value equal to its `.defaults.slowStartDelay`.", function () {
-			expect( tt._tempSlowStart ).toEqual( tt.defaults.slowStartDelay );  // 5
+			expect( stm._tempSlowStart ).toEqual( stm.defaults.slowStartDelay );  // 5
 		});
 
 		describe( ", when called four times in a row with a string that has no other modifiers,", function () {
 
 			it( "should reduce the slow start delay by 1/1.5 each time with a minimum value of 1.", function () {
 
-				var start = tt.defaults.slowStartDelay;
+				var start = stm.defaults.slowStartDelay;
 
-				expect( tt._tempSlowStart ).toEqual( start );  // 5
+				expect( stm._tempSlowStart ).toEqual( start );  // 5
 				
-				var faster = tt.calcDelay( 'abcd' );
+				var faster = stm.calcDelay( 'abcd' );
 				expect( faster ).toEqual( 800 );
-				expect( tt._tempSlowStart ).toEqual( start/1.5 );  // 3.3333333333333335
+				expect( stm._tempSlowStart ).toEqual( start/1.5 );  // 3.3333333333333335
 
-				faster = tt.calcDelay( 'abcd' );
+				faster = stm.calcDelay( 'abcd' );
 				expect( Math.floor( faster ) ).toEqual( 533 );  // 533.3333333333334
-				expect( tt._tempSlowStart ).toEqual( start/1.5/1.5 );  // 1.4814814814814816
+				expect( stm._tempSlowStart ).toEqual( start/1.5/1.5 );  // 1.4814814814814816
 
-				faster = tt.calcDelay( 'abcd' );
+				faster = stm.calcDelay( 'abcd' );
 				expect( Math.floor( faster ) ).toEqual( 355 );  // 355.5555555555556
-				expect( tt._tempSlowStart ).toEqual( start/1.5/1.5/1.5 );  // 1.4814814814814816
+				expect( stm._tempSlowStart ).toEqual( start/1.5/1.5/1.5 );  // 1.4814814814814816
 
-				faster = tt.calcDelay( 'abcd' );
+				faster = stm.calcDelay( 'abcd' );
 				expect( faster ).toEqual( 240 )
-				expect( tt._tempSlowStart ).toEqual( 1 );
+				expect( stm._tempSlowStart ).toEqual( 1 );
 
 			});
 
@@ -70,12 +70,12 @@ describe( "When a TickerText instance is created,", function () {
 
 			it( "should refresh the slow start delay value.", function () {
 
-				var one = tt.calcDelay( 'abcd' ),
-					two = tt.calcDelay( 'abcd' ),
-					reset = tt.resetSlowStart();
-				expect( tt._tempSlowStart ).toEqual( tt.defaults.slowStartDelay );
+				var one = stm.calcDelay( 'abcd' ),
+					two = stm.calcDelay( 'abcd' ),
+					reset = stm.resetSlowStart();
+				expect( stm._tempSlowStart ).toEqual( stm.defaults.slowStartDelay );
 
-				var three = three = tt.calcDelay( 'abcd' )
+				var three = three = stm.calcDelay( 'abcd' )
 				expect( three ).toEqual(800)
 
 			});
@@ -92,7 +92,7 @@ describe( "When a TickerText instance is created,", function () {
 			describe( "none,", function () {
 				beforeEach(function() { ms = 800 });
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( 'abcd' ) ).toEqual( ms );
+					expect( stm.calcDelay( 'abcd' ) ).toEqual( ms );
 				});
 			});
 			
@@ -103,18 +103,18 @@ describe( "When a TickerText instance is created,", function () {
 
 				// expect( function() {return val < 3} ).toEqual( true );  // Testing test
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( 'ab' ) ).toEqual( ms );
+					expect( stm.calcDelay( 'ab' ) ).toEqual( ms );
 				});
 
 				// expect( function() {return val < 3} ).toEqual( true );  // Testing test
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( 'a' ) ).toEqual( ms );
+					expect( stm.calcDelay( 'a' ) ).toEqual( ms );
 				});
 
 				// expect( function() {return val < 3} ).toEqual( true );  // Testing test
 				// ??: Should return 0?
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( '' ) ).toEqual( ms );
+					expect( stm.calcDelay( '' ) ).toEqual( ms );
 				});
 
 			});  // End < 3 characters
@@ -123,7 +123,7 @@ describe( "When a TickerText instance is created,", function () {
 			describe( "more than 8 characters,", function () {
 				beforeEach(function() { ms = 1200 });
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( 'abcdabcda' ) ).toEqual( ms );
+					expect( stm.calcDelay( 'abcdabcda' ) ).toEqual( ms );
 				});
 			});  // End > 8 characters
 
@@ -133,19 +133,19 @@ describe( "When a TickerText instance is created,", function () {
 				beforeEach(function() { ms = 4000 });
 
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( 'abcd.' ) ).toEqual( ms );
+					expect( stm.calcDelay( 'abcd.' ) ).toEqual( ms );
 				});
 
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( 'abc.d..' ) ).toEqual( ms );
+					expect( stm.calcDelay( 'abc.d..' ) ).toEqual( ms );
 				});
 
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( 'abc.d.!' ) ).toEqual( ms );
+					expect( stm.calcDelay( 'abc.d.!' ) ).toEqual( ms );
 				});
 
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( 'abc.d.?' ) ).toEqual( ms );
+					expect( stm.calcDelay( 'abc.d.?' ) ).toEqual( ms );
 				});
 
 			});  // End sentence
@@ -157,81 +157,81 @@ describe( "When a TickerText instance is created,", function () {
 
 				describe( "one or more '\"'", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd"' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( '"abcd"' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd"' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( '"abcd"' ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more \"'\"'", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( "abcd'" ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( "'abcd'" ) ).toEqual( ms );
+						expect( stm.calcDelay( "abcd'" ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( "'abcd'" ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more '”'", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd”' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( '”abcd”' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd”' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( '”abcd”' ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more '’'", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd’' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( '’abcd’' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd’' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( '’abcd’' ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more '('", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd(' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( '(abcd(' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd(' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( '(abcd(' ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more ')'", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd)' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( ')abcd)' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd)' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( ')abcd)' ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more ':'", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd:' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( ':abcd:' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd:' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( ':abcd:' ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more ';'", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd;' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( ';abcd;' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd;' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( ';abcd;' ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more ','", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd,' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( ',abcd,' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd,' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( ',abcd,' ) ).toEqual( ms );
 					});
 				});
 
 				describe( "one or more '_'", function () {
 					it( "should return " + ms + ".", function () {
-						expect( tt.calcDelay( 'abcd_' ) ).toEqual( ms );
-						tt.resetSlowStart();
-						expect( tt.calcDelay( '_abcd_' ) ).toEqual( ms );
+						expect( stm.calcDelay( 'abcd_' ) ).toEqual( ms );
+						stm.resetSlowStart();
+						expect( stm.calcDelay( '_abcd_' ) ).toEqual( ms );
 					});
 				});
 
@@ -243,13 +243,13 @@ describe( "When a TickerText instance is created,", function () {
 
 				beforeEach(function() { ms = 1600 });
 				it( "should return " + ms + ".", function () {
-					expect( tt.calcDelay( '12345' ) ).toEqual( ms );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( 'ab345' ) ).toEqual( ms );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( '123de' ) ).toEqual( ms );
-					tt.resetSlowStart();
-					expect( tt.calcDelay( '12cd5' ) ).toEqual( ms );
+					expect( stm.calcDelay( '12345' ) ).toEqual( ms );
+					stm.resetSlowStart();
+					expect( stm.calcDelay( 'ab345' ) ).toEqual( ms );
+					stm.resetSlowStart();
+					expect( stm.calcDelay( '123de' ) ).toEqual( ms );
+					stm.resetSlowStart();
+					expect( stm.calcDelay( '12cd5' ) ).toEqual( ms );
 				});
 
 			});  // End numerical characters
@@ -264,55 +264,55 @@ describe( "When a TickerText instance is created,", function () {
 		// ---- Unexpected Values For First Argument ---- \\
 		describe( ", when given no first argument", function () {
 			it( "should throw a TypyError.", function () {
-				expect( function(){ return tt.calcDelay() } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay() } ).toThrowError( TypeError, /first/ )
 			});
 		});
 
 		describe( ", when given `null` as a first argument", function () {
 			it( "should throw a TypyError.", function () {
-				expect( function(){ return tt.calcDelay( null ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( null ) } ).toThrowError( TypeError, /first/ )
 			});
 		});
 
 		describe( ", when given `true` as a first argument", function () {
 			it( "should throw a TypyError.", function () {
-				expect( function(){ return tt.calcDelay( true ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( true ) } ).toThrowError( TypeError, /first/ )
 			});
 		});
 
 		describe( ", when given `false` as a first argument", function () {
 			it( "should throw a TypyError.", function () {
-				expect( function(){ return tt.calcDelay( false ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( false ) } ).toThrowError( TypeError, /first/ )
 			});
 		});
 
 		describe( ", when given an object as a first argument", function () {
 			it( "should throw a TypyError.", function () {
-				expect( function(){ return tt.calcDelay( {} ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( {} ) } ).toThrowError( TypeError, /first/ )
 			});
 		});
 
 		describe( ", when given an empty array as a first argument", function () {
 			it( "should throw a TypyError.", function () {
-				expect( function(){ return tt.calcDelay( [] ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( [] ) } ).toThrowError( TypeError, /first/ )
 			});
 		});
 
 		describe( ", when given an array as a first argument", function () {
 			it( "should throw a TypyError.", function () {
-				expect( function(){ return tt.calcDelay( [1, 2, 3] ) } ).toThrowError( TypeError, /first/ )
-				expect( function(){ return tt.calcDelay( ['1', '2', '3'] ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( [1, 2, 3] ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( ['1', '2', '3'] ) } ).toThrowError( TypeError, /first/ )
 			});
 		});
 
 		describe( ", when given a number as a first argument", function () {
 			it( "should throw a TypyError.", function () {
-				expect( function(){ return tt.calcDelay( 0 ) } ).toThrowError( TypeError, /first/ )
-				expect( function(){ return tt.calcDelay( 1 ) } ).toThrowError( TypeError, /first/ )
-				expect( function(){ return tt.calcDelay( 5 ) } ).toThrowError( TypeError, /first/ )
-				expect( function(){ return tt.calcDelay( -1 ) } ).toThrowError( TypeError, /first/ )
-				expect( function(){ return tt.calcDelay( 0.1 ) } ).toThrowError( TypeError, /first/ )
-				expect( function(){ return tt.calcDelay( -0.1 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( 0 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( 1 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( 5 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( -1 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( 0.1 ) } ).toThrowError( TypeError, /first/ )
+				expect( function(){ return stm.calcDelay( -0.1 ) } ).toThrowError( TypeError, /first/ )
 			});
 		});
 
@@ -322,9 +322,9 @@ describe( "When a TickerText instance is created,", function () {
 		describe( ", when given NOTHING as a second argument", function () {
 			it( "SHOULD reduce its `._tempSlowStart` value", function () {
 
-				var start = tt._tempSlowStart;
-				tt.calcDelay( 'abcd' );
-				expect( tt._tempSlowStart ).toEqual( start/1.5 );
+				var start = stm._tempSlowStart;
+				stm.calcDelay( 'abcd' );
+				expect( stm._tempSlowStart ).toEqual( start/1.5 );
 
 			});
 		});
@@ -332,9 +332,9 @@ describe( "When a TickerText instance is created,", function () {
 		describe( ", when given `true` as a second argument", function () {
 			it( "should not decrease its `._tempSlowStart`", function () {
 
-				var start = tt._tempSlowStart;
-				tt.calcDelay( 'abcd', true );
-				expect( tt._tempSlowStart ).toEqual( start );
+				var start = stm._tempSlowStart;
+				stm.calcDelay( 'abcd', true );
+				expect( stm._tempSlowStart ).toEqual( start );
 
 			});
 		});
@@ -344,9 +344,9 @@ describe( "When a TickerText instance is created,", function () {
 		describe( ", when given `false` as the second argument", function () {
 			it( "SHOULD reduce its `._tempSlowStart` value", function () {
 
-				var start = tt._tempSlowStart;
-				tt.calcDelay( 'abcd', false );
-				expect( tt._tempSlowStart ).toEqual( start/1.5 );
+				var start = stm._tempSlowStart;
+				stm.calcDelay( 'abcd', false );
+				expect( stm._tempSlowStart ).toEqual( start/1.5 );
 
 			});
 		});
@@ -356,37 +356,37 @@ describe( "When a TickerText instance is created,", function () {
 		describe( "should give a TypeError", function () {
 
 			it( "when given `null` as a second argument", function () {
-				expect( function(){ return tt.calcDelay( 'abcd', null ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', null ) } ).toThrowError( TypeError, /second/ )
 			});
 
 			it( "when given an object as a second argument", function () {
-				expect( function(){ return tt.calcDelay( 'abcd', {} ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', {} ) } ).toThrowError( TypeError, /second/ )
 			});
 
 			it( "when given an empty array as a second argument", function () {
-				expect( function(){ return tt.calcDelay( 'abcd', [] ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', [] ) } ).toThrowError( TypeError, /second/ )
 			});
 
 			it( "when given an array as a second argument", function () {
-				expect( function(){ return tt.calcDelay( 'abcd', [1, 2, 3] ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', ['1', '2', '3'] ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', [1, 2, 3] ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', ['1', '2', '3'] ) } ).toThrowError( TypeError, /second/ )
 			});
 
 			it( "when given a number as a second argument", function () {
-				expect( function(){ return tt.calcDelay( 'abcd', 0 ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', 1 ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', 5 ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', -1 ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', 0.1 ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', -0.1 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', 0 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', 1 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', 5 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', -1 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', 0.1 ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', -0.1 ) } ).toThrowError( TypeError, /second/ )
 			});
 
 			it( "when given a string as a second argument", function () {
-				expect( function(){ return tt.calcDelay( 'abcd', '0' ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', '1' ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', 'abcd' ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', '' ) } ).toThrowError( TypeError, /second/ )
-				expect( function(){ return tt.calcDelay( 'abcd', '#*' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', '0' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', '1' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', 'abcd' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', '' ) } ).toThrowError( TypeError, /second/ )
+				expect( function(){ return stm.calcDelay( 'abcd', '#*' ) } ).toThrowError( TypeError, /second/ )
 			});
 
 		});  // End justOnce TypeError
@@ -409,37 +409,37 @@ describe( "When a TickerText instance is created,", function () {
 			longWordDelay: 	1.5,
 		};
 
-		beforeEach(function() { tt = new TT( custom ) });
+		beforeEach(function() { stm = new StringTime( custom ) });
 
 		// ----- Expected Values ----- \\
 		it( "should use the reference to the custom settings object", function () {
-			expect( tt._settings ).toBe( custom );
+			expect( stm._settings ).toBe( custom );
 		});
 
 		describe( "should use the custom settings object's values", function () {
 
 			it("for plain strings.", function() {
-				expect( tt.calcDelay( 'abcd' ) ).toEqual( 300 );
+				expect( stm.calcDelay( 'abcd' ) ).toEqual( 300 );
 			})
 
 			it("for short strings.", function() {
-				expect( tt.calcDelay( 'ab' ) ).toEqual( 390 );
+				expect( stm.calcDelay( 'ab' ) ).toEqual( 390 );
 			})
 
 			it("for long strings.", function() {
-				expect( tt.calcDelay( 'abcdefghijklm' ) ).toEqual( 450 );
+				expect( stm.calcDelay( 'abcdefghijklm' ) ).toEqual( 450 );
 			})
 
 			it("for strings with sentence-ending punctuation.", function() {
-				expect( tt.calcDelay( 'abcd.' ) ).toEqual( 600 );
+				expect( stm.calcDelay( 'abcd.' ) ).toEqual( 600 );
 			})
 
 			it("for strings with non-sentence-ending punctuation.", function() {
-				expect( tt.calcDelay( 'abcd,' ) ).toEqual( 1500 );
+				expect( stm.calcDelay( 'abcd,' ) ).toEqual( 1500 );
 			})
 
 			it("for strings with numbers.", function() {
-				expect( tt.calcDelay( 'abc3' ) ).toEqual( 960 );
+				expect( stm.calcDelay( 'abc3' ) ).toEqual( 960 );
 			})
 
 		});  // End regular custom settings values
@@ -459,7 +459,7 @@ describe( "When a TickerText instance is created,", function () {
 					shortWordDelay: 1.3,
 					longWordDelay: 	1.5,
 				};
-				tt = new TT( custom2 )
+				stm = new StringTime( custom2 )
 				// wpm isn't used as a modifier, just used elsewhere to calculate _baseDelay
 				custom2._baseDelay 		= 450;
 				custom2.slowStartDelay 	= 4;
@@ -471,28 +471,28 @@ describe( "When a TickerText instance is created,", function () {
 			});
 
 			it( "For `_baseDelay`.", function () {
-				expect( tt._settings._baseDelay ).toEqual( 450 );
-				expect( tt.calcDelay( 'abcd' ) ).toEqual( 1200 );
+				expect( stm._settings._baseDelay ).toEqual( 450 );
+				expect( stm.calcDelay( 'abcd' ) ).toEqual( 1200 );
 			});
 
 			it("For short strings.", function() {
-				expect( tt.calcDelay( 'ab' ) ).toEqual( 2880 );
+				expect( stm.calcDelay( 'ab' ) ).toEqual( 2880 );
 			})
 
 			it("For long strings.", function() {
-				expect( tt.calcDelay( 'abcdefghijklm' ) ).toEqual( 1440 );
+				expect( stm.calcDelay( 'abcdefghijklm' ) ).toEqual( 1440 );
 			})
 
 			it("For strings with sentence-ending punctuation.", function() {
-				expect( tt.calcDelay( 'abcd.' ) ).toEqual( 7200 );
+				expect( stm.calcDelay( 'abcd.' ) ).toEqual( 7200 );
 			})
 
 			it("For strings with non-sentence-ending punctuation.", function() {
-				expect( tt.calcDelay( 'abcd,' ) ).toEqual( 3360 );
+				expect( stm.calcDelay( 'abcd,' ) ).toEqual( 3360 );
 			})
 
 			it("For strings with numbers.", function() {
-				expect( tt.calcDelay( 'abc3' ) ).toEqual( 4800 );
+				expect( stm.calcDelay( 'abc3' ) ).toEqual( 4800 );
 			})
 
 		});  // End changes in custom settings object
