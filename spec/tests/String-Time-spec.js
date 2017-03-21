@@ -1,4 +1,4 @@
-describe( "When a StringTime instance is created,", function () {
+describe( "When a StringTime instance is created", function () {
 
 	var StringTime = require('../../dist/String-Time.js');
 
@@ -12,7 +12,7 @@ describe( "When a StringTime instance is created,", function () {
 
 
 	// ======== NO CONSTRUCTOR ARGUMENTS ======== \\
-	describe( "without an argument, that instance's `.calcDelay()`", function () {
+	describe( "without an argument that instance's `.calcDelay()`", function () {
 
 		// --- Basics --- \\
 		it( "should return a number.", function () {
@@ -396,9 +396,11 @@ describe( "When a StringTime instance is created,", function () {
 
 
 	// ======== WITH CONSTRUCTOR ARGUMENTS (Custom Settings) ======== \\
-	describe( "with an argument, that instance's `.calcDelay()`", function () {
 
-		var custom = {
+
+	var oneWrongValue = function ( propName, val ) {
+
+		var oneWrong = {
 			wpm: 			400,
 			_baseDelay: 	1/(400/60)*1000,  // based on wpm
 			slowStartDelay: 3,
@@ -409,47 +411,51 @@ describe( "When a StringTime instance is created,", function () {
 			longWordDelay: 	1.5,
 		};
 
-		beforeEach(function() { stm = new StringTime( custom ) });
+		oneWrong[ propName ] = val;
 
-		// ----- Expected Values ----- \\
-		it( "should use the reference to the custom settings object", function () {
-			expect( stm._settings ).toBe( custom );
-		});
+		return oneWrong;
+	};  // End oneWrongValue()
 
-		describe( "should use the custom settings object's values", function () {
-
-			it("for plain strings.", function() {
-				expect( stm.calcDelay( 'abcd' ) ).toEqual( 300 );
-			})
-
-			it("for short strings.", function() {
-				expect( stm.calcDelay( 'ab' ) ).toEqual( 390 );
-			})
-
-			it("for long strings.", function() {
-				expect( stm.calcDelay( 'abcdefghijklm' ) ).toEqual( 450 );
-			})
-
-			it("for strings with sentence-ending punctuation.", function() {
-				expect( stm.calcDelay( 'abcd.' ) ).toEqual( 600 );
-			})
-
-			it("for strings with non-sentence-ending punctuation.", function() {
-				expect( stm.calcDelay( 'abcd,' ) ).toEqual( 1500 );
-			})
-
-			it("for strings with numbers.", function() {
-				expect( stm.calcDelay( 'abc3' ) ).toEqual( 960 );
-			})
-
-		});  // End regular custom settings values
+	var wrongValues = [ null, true, false, {}, [], [1.3], '1', NaN, -1 ];
+	var props = [ '_baseDelay', 'slowStartDelay', 'sentenceDelay',
+	'otherPuncDelay', 'numericDelay', 'shortWordDelay', 'longWordDelay' ];
 
 
-		// ---- that change ---- \\
-		describe( "should reflect the changes in the custom `settings` object.", function () {
+	describe( "with an argument", function () {
 
+		// ----- Unexpected Values when constructed ----- \\
+		describe( "containing an unexpected value", function () {
+
+			it( "it should throw an error during construction", function () {
+
+				for (let vali = 0; vali < wrongValues.length; vali++) {
+					
+					let wrongVal = wrongValues[vali];
+					for ( let propi = 0; propi < props.length; propi++ ) {
+
+						let prop = props[ propi ];
+						let arg = oneWrongValue( prop, wrongVal )
+
+						if ( typeof arg[prop] !== 'number' ) {
+							expect( function() { new StringTime( arg ); } ).toThrowError( TypeError )
+						} else {
+							expect( function() { new StringTime( arg ); } ).toThrowError( RangeError )
+						}
+
+					}// end for every property
+
+				}  // end for every wrong value
+
+			});  // End error during construction
+
+		});  // End constructor argument containing unexpected value
+
+		// ----- Expected Values when constructed ----- \\
+		describe( "that contains valid values", function () {
+
+			var custom;
 			beforeEach(function() {
-				var custom2 = {
+				custom = {
 					wpm: 			400,
 					_baseDelay: 	1/(400/60)*1000,  // based on wpm
 					slowStartDelay: 3,
@@ -459,43 +465,106 @@ describe( "When a StringTime instance is created,", function () {
 					shortWordDelay: 1.3,
 					longWordDelay: 	1.5,
 				};
-				stm = new StringTime( custom2 )
-				// wpm isn't used as a modifier, just used elsewhere to calculate _baseDelay
-				custom2._baseDelay 		= 450;
-				custom2.slowStartDelay 	= 4;
-				custom2.sentenceDelay 	= 6;
-				custom2.otherPuncDelay 	= 2.8;
-				custom2.numericDelay 	= 4;
-				custom2.shortWordDelay 	= 2.4;
-				custom2.longWordDelay 	= 1.2;
+				stm = new StringTime( custom )
 			});
 
-			it( "For `_baseDelay`.", function () {
-				expect( stm._settings._baseDelay ).toEqual( 450 );
-				expect( stm.calcDelay( 'abcd' ) ).toEqual( 1200 );
+			describe( "that instance's `.calcDelay()`", function () {
+
+				// ----- Expected Values ----- \\
+				it( "should use the reference to the custom settings object", function () {
+					expect( stm._settings ).toBe( custom );
+				});
+
+				describe( "should use the custom settings object's values", function () {
+
+					it("for plain strings.", function() {
+						expect( stm.calcDelay( 'abcd' ) ).toEqual( 300 );
+					})
+
+					it("for short strings.", function() {
+						expect( stm.calcDelay( 'ab' ) ).toEqual( 390 );
+					})
+
+					it("for long strings.", function() {
+						expect( stm.calcDelay( 'abcdefghijklm' ) ).toEqual( 450 );
+					})
+
+					it("for strings with sentence-ending punctuation.", function() {
+						expect( stm.calcDelay( 'abcd.' ) ).toEqual( 600 );
+					})
+
+					it("for strings with non-sentence-ending punctuation.", function() {
+						expect( stm.calcDelay( 'abcd,' ) ).toEqual( 1500 );
+					})
+
+					it("for strings with numbers.", function() {
+						expect( stm.calcDelay( 'abc3' ) ).toEqual( 960 );
+					})
+
+				});  // End regular custom settings values
+
+
+				// ---- that change ---- \\
+				describe( "should reflect the changes in the custom `settings` object.", function () {
+
+					beforeEach(function() {
+						var custom2 = {
+							wpm: 			400,
+							_baseDelay: 	1/(400/60)*1000,  // based on wpm
+							slowStartDelay: 3,
+							sentenceDelay: 	2,
+							otherPuncDelay: 5,
+							numericDelay: 	3.2,
+							shortWordDelay: 1.3,
+							longWordDelay: 	1.5,
+						};
+						stm = new StringTime( custom2 )
+						// wpm isn't used as a modifier, just used elsewhere to calculate _baseDelay
+						custom2._baseDelay 		= 450;
+						custom2.slowStartDelay 	= 4;
+						custom2.sentenceDelay 	= 6;
+						custom2.otherPuncDelay 	= 2.8;
+						custom2.numericDelay 	= 4;
+						custom2.shortWordDelay 	= 2.4;
+						custom2.longWordDelay 	= 1.2;
+					});
+
+					it( "For `_baseDelay`.", function () {
+						expect( stm._settings._baseDelay ).toEqual( 450 );
+						expect( stm.calcDelay( 'abcd' ) ).toEqual( 1200 );
+					});
+
+					it("For short strings.", function() {
+						expect( stm.calcDelay( 'ab' ) ).toEqual( 2880 );
+					})
+
+					it("For long strings.", function() {
+						expect( stm.calcDelay( 'abcdefghijklm' ) ).toEqual( 1440 );
+					})
+
+					it("For strings with sentence-ending punctuation.", function() {
+						expect( stm.calcDelay( 'abcd.' ) ).toEqual( 7200 );
+					})
+
+					it("For strings with non-sentence-ending punctuation.", function() {
+						expect( stm.calcDelay( 'abcd,' ) ).toEqual( 3360 );
+					})
+
+					it("For strings with numbers.", function() {
+						expect( stm.calcDelay( 'abc3' ) ).toEqual( 4800 );
+					})
+
+				});  // End changes in custom settings object
+
+			});  // End calling `.calcDelay()`
+
+			// --- after changing to an unexpected value --- \\
+			describe( "and the values change to something unexpected,", function () {
+				xit( "it should throw an error for everything except `.slowStartDelay` when `.calcDelay()` is used", function () {});
+				xit( "it should throw an error for `.slowStartDelay` when `.resetSlowStart()` is used", function () {});
 			});
 
-			it("For short strings.", function() {
-				expect( stm.calcDelay( 'ab' ) ).toEqual( 2880 );
-			})
-
-			it("For long strings.", function() {
-				expect( stm.calcDelay( 'abcdefghijklm' ) ).toEqual( 1440 );
-			})
-
-			it("For strings with sentence-ending punctuation.", function() {
-				expect( stm.calcDelay( 'abcd.' ) ).toEqual( 7200 );
-			})
-
-			it("For strings with non-sentence-ending punctuation.", function() {
-				expect( stm.calcDelay( 'abcd,' ) ).toEqual( 3360 );
-			})
-
-			it("For strings with numbers.", function() {
-				expect( stm.calcDelay( 'abc3' ) ).toEqual( 4800 );
-			})
-
-		});  // End changes in custom settings object
+		});  // End with valid values
 
 	});  // End with-argument constructor
 

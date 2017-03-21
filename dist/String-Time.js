@@ -52,6 +52,11 @@
 * it's an object, it's given the "settings" object right
 * up front at the start. Much more transparent. Also, it
 * does need some persistence for `._tempSlowStart`
+* 
+* 
+* TODO:
+* - Base `.slowStartDelay` on wpm, converting to a
+* 	multiplier on the fly
 */
 
 (function (root, timeFactory) {  // root is usually `window`
@@ -79,7 +84,7 @@
 		var stm = {};
 
 		var _setts 			= null;
-		stm._tempSlowStart = null;
+		stm._tempSlowStart 	= null;
 
 		// TODO: Rename 'slowStartDelay' to 'warmupDelay'
 		var toMultiplyBy = stm._toMultiplyBy = {
@@ -128,11 +133,14 @@
 		*/
 			var val = null;
 
-			if ( _setts && _setts[ propName ] ) {
+			if ( _setts && _setts[ propName ] !== undefined ) {
 
 				var val = _setts[ propName ];
-				if ( typeof val !== 'number' || isNaN(val) || val < 0 ) {
-					throw new TypeError( "The settings value '" + delayModKey + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + mod );
+				if ( typeof val !== 'number' ) {
+					throw new TypeError( "The settings value '" + propName + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + val );
+				}
+				if  ( val < 0 || isNaN(val) ) {
+					throw new RangeError( "The settings value '" + propName + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + val );
 				}
 
 			} else {
@@ -246,8 +254,27 @@
 
 		// ======= SET STARTING VALUES ======== \\
 
+		// --- validation --- \\
+		stm._checkSettings = function ( settings ) {
+		// Check all the custom settings and throw an error if needed
+			if ( !settings ) { return stm; }
+
+			for ( let key in toMultiplyBy ) {
+				let name = toMultiplyBy[ key ];
+				stm.orDefault( name );
+			}
+
+			stm.orDefault( '_baseDelay' );
+			stm.orDefault( 'slowStartDelay' );
+
+			return stm;
+		}
+
+
 		stm._init = function ( settings ) {
 			_setts = stm._settings = settings;
+			stm._checkSettings( settings );
+
 			stm.resetSlowStart();  // Start at default warmup setting
 			return stm;
 		}
