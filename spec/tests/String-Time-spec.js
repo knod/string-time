@@ -398,9 +398,9 @@ describe( "When a StringTime instance is created", function () {
 	// ======== WITH CONSTRUCTOR ARGUMENTS (Custom Settings) ======== \\
 
 
-	var oneWrongValue = function ( propName, val ) {
+	var oneChangedValue = function ( propName, val, obj ) {
 
-		var oneWrong = {
+		var oneChanged = obj || {
 			wpm: 			400,
 			_baseDelay: 	1/(400/60)*1000,  // based on wpm
 			slowStartDelay: 3,
@@ -411,17 +411,20 @@ describe( "When a StringTime instance is created", function () {
 			longWordDelay: 	1.5,
 		};
 
-		oneWrong[ propName ] = val;
+		oneChanged[ propName ] = val;
 
-		return oneWrong;
-	};  // End oneWrongValue()
+		return oneChanged;
+	};  // End oneChangedValue()
+
 
 	var wrongValues = [ null, true, false, {}, [], [1.3], '1', NaN, -1 ];
 	var props = [ '_baseDelay', 'slowStartDelay', 'sentenceDelay',
 	'otherPuncDelay', 'numericDelay', 'shortWordDelay', 'longWordDelay' ];
 
-
 	describe( "with an argument", function () {
+
+		// ----- Unexpected constructor argument ----- \\
+		xit("that has an unexpected value")
 
 		// ----- Unexpected Values when constructed ----- \\
 		describe( "containing an unexpected value", function () {
@@ -434,7 +437,7 @@ describe( "When a StringTime instance is created", function () {
 					for ( let propi = 0; propi < props.length; propi++ ) {
 
 						let prop = props[ propi ];
-						let arg = oneWrongValue( prop, wrongVal )
+						let arg = oneChangedValue( prop, wrongVal )
 
 						if ( typeof arg[prop] !== 'number' ) {
 							expect( function() { new StringTime( arg ); } ).toThrowError( TypeError )
@@ -442,7 +445,7 @@ describe( "When a StringTime instance is created", function () {
 							expect( function() { new StringTime( arg ); } ).toThrowError( RangeError )
 						}
 
-					}// end for every property
+					}  // end for every property
 
 				}  // end for every wrong value
 
@@ -560,8 +563,84 @@ describe( "When a StringTime instance is created", function () {
 
 			// --- after changing to an unexpected value --- \\
 			describe( "and the values change to something unexpected,", function () {
-				xit( "it should throw an error for everything except `.slowStartDelay` when `.calcDelay()` is used", function () {});
-				xit( "it should throw an error for `.slowStartDelay` when `.resetSlowStart()` is used", function () {});
+
+				it( "when `.calcDelay()` is called an error should be thrown.", function () {
+
+					for (let vali = 0; vali < wrongValues.length; vali++) {
+						
+						let wrongVal = wrongValues[vali];
+						for ( let propi = 0; propi < props.length; propi++ ) {
+
+							let propName = props[ propi ],
+								oldVal 	 = custom[ propName ];
+
+							oneChangedValue( propName, wrongVal, custom )
+							let newVal 	 = custom[ propName ]
+
+							if ( propName === 'shortWordDelay' ) {
+
+								if ( typeof newVal !== 'number' ) {
+									expect( function() { stm.calcDelay( 'ab' ) } ).toThrowError( TypeError )
+								} else {
+									expect( function() { stm.calcDelay( 'ab' ) } ).toThrowError( RangeError )
+								}
+							} else if ( propName === 'longWordDelay' ) {
+
+								if ( typeof newVal !== 'number' ) {
+									expect( function() { stm.calcDelay( 'abcdefghijklm' ) } ).toThrowError( TypeError )
+								} else {
+									expect( function() { stm.calcDelay( 'abcdefghijklm' ) } ).toThrowError( RangeError )
+								}
+							} else {
+
+								if ( typeof newVal !== 'number' ) {
+									expect( function() { stm.calcDelay( 'abc.,2' ) } ).toThrowError( TypeError )
+								} else {
+									expect( function() { stm.calcDelay( 'abc.,2' ) } ).toThrowError( RangeError )
+								}
+							}
+
+							custom[ propName ] = oldVal;
+							stm.resetSlowStart();
+
+						}  // end for every property
+					}  // end for every wrong value
+
+				});  // End a value changes to something unexpected `.calcDelay()`
+
+				// --- .resetSlowStart() --- \\
+				it( "it should throw an error for `.slowStartDelay` when `.resetSlowStart()` is called.", function () {
+
+					for (let vali = 0; vali < wrongValues.length; vali++) {
+						
+						let wrongVal = wrongValues[vali];
+						for ( let propi = 0; propi < props.length; propi++ ) {
+
+							let propName = props[ propi ],
+								oldVal 	 = custom[ propName ];
+
+							oneChangedValue( propName, wrongVal, custom )
+							let newVal 	 = custom[ propName ]
+
+							// console.log('*******', propName + ':', newVal);
+							if ( propName !== 'slowStartDelay' ) {
+								expect( function() { stm.resetSlowStart(); } ).not.toThrowError()
+							} else {
+								if ( typeof newVal !== 'number' ) {
+									expect( function() { stm.resetSlowStart() } ).toThrowError( TypeError )
+								} else {
+									expect( function() { stm.resetSlowStart() } ).toThrowError( RangeError )
+								}
+							}
+
+							custom[ propName ] = oldVal;
+							// console.log('old:', oldVal, '; new:', newVal, '; done:', custom[ propName ])
+							stm.resetSlowStart();
+
+						}  // end for every property
+					}  // end for every wrong value
+
+				});
 			});
 
 		});  // End with valid values

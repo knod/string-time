@@ -136,10 +136,14 @@
 			if ( _setts && _setts[ propName ] !== undefined ) {
 
 				var val = _setts[ propName ];
+
+// console.log(propName + ':', val)
 				if ( typeof val !== 'number' ) {
+					// console.log('xxx type error xxx')
 					throw new TypeError( "The settings value '" + propName + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + val );
 				}
 				if  ( val < 0 || isNaN(val) ) {
+					// console.log('xxx range error xxx')
 					throw new RangeError( "The settings value '" + propName + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + val );
 				}
 
@@ -272,6 +276,7 @@
 
 
 		stm._init = function ( settings ) {
+		// `settings` can be an object, empty or not, or something falsy
 			_setts = stm._settings = settings;
 			stm._checkSettings( settings );
 
