@@ -423,8 +423,33 @@ describe( "When a StringTime instance is created", function () {
 
 	describe( "with an argument", function () {
 
+		// ----- Expected constructor argument ----- \\
+		describe( "that is an empty object", function () {
+			it( "should not throw an error.", function() {
+				expect( function() { new StringTime( {} ); } ).not.toThrowError();
+			})
+		});  // End constructor argument empty object
+
 		// ----- Unexpected constructor argument ----- \\
-		xit("that has an unexpected value")
+		describe( "that has an unexpected value", function () {
+
+			it( "should throw an appropriate error.", function() {
+
+				for (let vali = 0; vali < wrongValues.length; vali++) {
+					
+					let wrongVal = wrongValues[vali];
+					for ( let propi = 0; propi < props.length; propi++ ) {
+
+						let prop = props[ propi ];
+						let arg = oneChangedValue( prop, wrongVal )
+
+						if ( wrongVal !== {} ) {  // empty objects are ok
+							expect( function() { new StringTime( arg ); } ).toThrowError();
+						}
+					}  // end for every property
+				}  // end for every wrong value
+			})
+		});  // End constructor argument invalid
 
 		// ----- Unexpected Values when constructed ----- \\
 		describe( "containing an unexpected value", function () {
@@ -622,7 +647,6 @@ describe( "When a StringTime instance is created", function () {
 							oneChangedValue( propName, wrongVal, custom )
 							let newVal 	 = custom[ propName ]
 
-							// console.log('*******', propName + ':', newVal);
 							if ( propName !== 'slowStartDelay' ) {
 								expect( function() { stm.resetSlowStart(); } ).not.toThrowError()
 							} else {
@@ -634,7 +658,6 @@ describe( "When a StringTime instance is created", function () {
 							}
 
 							custom[ propName ] = oldVal;
-							// console.log('old:', oldVal, '; new:', newVal, '; done:', custom[ propName ])
 							stm.resetSlowStart();
 
 						}  // end for every property
