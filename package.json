@@ -1,6 +1,6 @@
 {
   "name": "string-time",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "Calculates how long a string should stay visible using the characteristics of that string, corresponding millisecond values, and other data",
   "main": "dist/String-Time.js",
   "scripts": {
