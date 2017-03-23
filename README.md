@@ -90,12 +90,12 @@ The functionality to add more delay modifiers after the fact hasn't been created
 MIT
 
 ---------
-## Issues
+## ISSUES
 
 Issues reports welcome at [https://github.com/knod/string-time/issues](https://github.com/knod/string-time/issues).
 
 ---------
-## Contributing
+## CONTRIBUTING
 
 Pull requests welcome, but please test your code befor making a pull request.
 
