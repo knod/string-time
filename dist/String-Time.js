@@ -6,9 +6,9 @@
 * object is tricky, and very tangled up with the code
 * that creates and uses it.
 * 
-* The creator of a StringTime instance (tt) passes in a
-* reference to an object which contains a `._settings`
-* property, which itself must contain these properties:
+* The creator of a StringTime instance (stm) passes in a
+* reference to an object, `settings`, which can contain
+* these used properties:
 * 
 * Base delay to work off of:
 * - _baseDelay (>=0, usually based on desired words per
@@ -21,23 +21,24 @@
 * - longWordDelay (>0)
 * - numericDelay (>0)
 * 
-* When `tt.calcDelay(str, bool)` is called, it tests the
-* properties of a string. It then uses the base delay
-* multiplied by the given modifiers to return how many
-* milliseconds a string should be displayed in the RSVP
-* app.
+* When `stm.calcDelay(str, bool)` is called, it tests the
+* properties of the string `str`. It then uses the base
+* delay multiplied whichever modifiers are relevant to return
+* how many milliseconds a string should be displayed in the
+* RSVP app.
 * 
-* StringTime depends `state`'s properties repeatedly, so
-* they can't be destroyed.
+* StringTime depends on `settings`'s properties repeatedly,
+* so it shouldn't be destroyed.
 * 
 * There are two other important features.
 * 
-* 1. The `slowStartDelay` property lets `tt` start the RSVP
+* 1. The `slowStartDelay` property lets `stm` start the RSVP
 * reader slowly, then lets it gain speed. You can reset to
-* your currently stored slow speed using `tt.resetSlowStart`.
+* your currently stored slow starting speed using
+* `stm.resetSlowStart()`.
 * 
 * 2. Passing a value of `true` as the optional second argument
-* to `tt.calcDelay()` freezes the progress of that speeding
+* to `stm.calcDelay()` freezes the progress of that speeding
 * up. In future, it may use that boolean to reset the slow
 * starting speed.
 * 
@@ -55,8 +56,10 @@
 * 
 * 
 * TODO:
-* - Base `.slowStartDelay` on wpm, converting to a
-* 	multiplier on the fly
+* - Base an internal `baseDelay` on external `.wpm`, converting
+* 	on the fly? Needs recalculating every time.
+* - Build list of multipliers and testing functions then make that
+* 	list modifiable
 */
 
 (function (root, timeFactory) {  // root is usually `window`
@@ -80,6 +83,7 @@
 	var StringTime = function ( settings ) {
 	/* ( {} ) -> StringTime
 	* 
+	* See discription of module above
 	*/
 		var stm = {};
 
@@ -112,12 +116,17 @@
 
 		// ============== HOOKS ============== \\
 
-		// // TODO: Switch to system of each property name having a corresponding function
-		// stm.set = function ( obj ) {
-		// // // `obj` consists of a function to check the string's properties,
-		// // // that function's name, a delay value, and a name for that value
-		// // 	toMultiplyBy[ obj.funcName ] = obj.delayName;
-
+		// // TODO:
+		// stm.add = function ( obj ) {
+		// // // `obj` consists of a function to test the string's properties,
+		// // // returning a boolean, a delay modifier name, and a default value
+		// 	defaults[ modName ] = val;
+		// 	mods.push( obj ); || mods[ modName ] = obj;
+		// 	// Also maybe make sure it's not overwritting a pre-existing mod
+		// };
+		// stm.remove = function ( modName ) {
+		// 	defaults[ modName ] = 1;
+		// 	mods[ modName ] = { func: function() {return false;} };
 		// };
 
 
@@ -137,13 +146,10 @@
 
 				var val = _setts[ propName ];
 
-// console.log(propName + ':', val)
 				if ( typeof val !== 'number' ) {
-					// console.log('xxx type error xxx')
 					throw new TypeError( "The settings value '" + propName + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + val );
 				}
 				if  ( val < 0 || isNaN(val) ) {
-					// console.log('xxx range error xxx')
 					throw new RangeError( "The settings value '" + propName + "' should have been a positive number, but was not. All I can print for you is this string version of that value: " + val );
 				}
 
@@ -156,12 +162,17 @@
 
 
 		stm.calcDelay = function ( str, justOnce ) {
-		/* ( str, [bool] ) -> Float
+		/* ( str, bool || undefined ) -> Float
 		* 
+		* See main description of module
+		* `justOnce` can make sure ._tempSlowStart isn't used up
+		* by things like .once() called repeatedly, like when the
+		* scrubber is moved.
 		*/
-			// TODO: ??: if (justOnce) {return 0}?
-			// TODO: ??: Always reset slowStart when justOnce
-			// === true?
+			// TODO: ??: if (justOnce) {return 0}? Check on use
+			// cases (at the start of `.play()`).
+			// TODO: ??: Always reset slowStart when justOnce ===
+			// true?
 
 			if ( typeof str !== 'string' ) {
 				throw new TypeError( 'The first argument to `.calcDelay` was not a string. What you sent:', str )
@@ -189,8 +200,6 @@
 			// Just after starting up again, go slowly, then speed up a bit
 			// each time the loop is called, eating away at this number
 			var extraDelay = stm._tempSlowStart;
-			// Make sure ._tempSlowStart isn't used up by things like .once()
-			// called repeatedly, like when the scrubber is moved.
 			// Reduce ._tempSlowStart a bit each time
 			// TODO: Make this customizable
 			if (!justOnce) {stm._tempSlowStart = Math.max( 1, extraDelay / 1.5 );}
@@ -204,15 +213,15 @@
 		stm.resetSlowStart = function ( val ) {
 		/* ( num ) -> StringTime
 		* 
-		* For after restart or pause, assign a value to start the
+		* After restart or pause, assign a value to start the
 		* text off slowly to warm the reader up to full speed.
 		*/
-			if ( val ) { stm._tempSlowStart = val; }  // What happens to the custom settings here?
+			if ( val ) { stm._tempSlowStart = val; }
 			else {
 				oldStart = stm._tempSlowStart = stm.orDefault( 'slowStartDelay' );
 			}
 			return stm;
-		};
+		};  // End stm.resetSlowStart()
 
 
 		// --- Processing String --- \\
@@ -260,7 +269,10 @@
 
 		// --- validation --- \\
 		stm._checkSettings = function ( settings ) {
-		// Check all the custom settings and throw an error if needed
+		/* ( {} ) -> StringTime
+		* 
+		* Check all the custom settings to throw an error if needed
+		*/
 			if ( !settings ) { return stm; }
 
 			for ( let key in toMultiplyBy ) {
@@ -272,17 +284,20 @@
 			stm.orDefault( 'slowStartDelay' );
 
 			return stm;
-		}
+		};  // End stm._checkSettings()
 
 
 		stm._init = function ( settings ) {
-		// `settings` can be an object, empty or not, or something falsy
+		/* ( {} || falsy ) -> StringTime
+		* 
+		* Set initial values
+		*/
 			_setts = stm._settings = settings;
 			stm._checkSettings( settings );
 
-			stm.resetSlowStart();  // Start at default warmup setting
+			stm.resetSlowStart();  // Start at warmup setting
 			return stm;
-		}
+		};  // End stm._init()
 
 
 		stm._init( settings );
@@ -292,4 +307,3 @@
 
     return StringTime;
 }));
-

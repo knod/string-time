@@ -10,7 +10,6 @@ describe( "When a StringTime instance is created", function () {
 	// If `.defaults` are changed, these results are going to change...
 
 
-
 	// ======== NO CONSTRUCTOR ARGUMENTS ======== \\
 	describe( "without an argument that instance's `.calcDelay()`", function () {
 
@@ -663,17 +662,12 @@ describe( "When a StringTime instance is created", function () {
 						}  // end for every property
 					}  // end for every wrong value
 
-				});
-			});
+				});  // end `.resetSlowStart()`
+
+			});  // end values get changed to something invalid
 
 		});  // End with valid values
 
 	});  // End with-argument constructor
 
-
-});  // End hyperaxe
-
-
-describe( "", function () {
-	xit( "test template", function () {});
-});
+});  // End StringTime
