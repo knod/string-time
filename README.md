@@ -3,7 +3,6 @@ Calculates how long a string should stay visible using the characteristics of th
 
 ---------
 ## INSTALLING FOR BROSWER OR NODE
----------
 
 ### If node is already installed on your system (installing for development)
 ```
@@ -18,7 +17,6 @@ See [Contributing](#contributing)
 
 ---------
 ## EXAMPLE
----------
 
 ### In the Browser
 ```js
@@ -33,7 +31,7 @@ var settings = {
 	}
 
 var stm 	= new StringTime( settings ),
-	delay1 	= stm.calcDelay( 'gone.', false ),  // 300
+	delay1 	= stm.calcDelay( 'gone.', false ),  	// 300
 	delay1 	= stm.calcDelay( 'gone.' ),  		// 300
 	delay2 	= stm.calcDelay( 'gone.' );  		// 200 (see description below for explanation)
 ```
@@ -52,16 +50,15 @@ var STm 	 = require('dist/String-Time'),
 	};
 
 var stm 	= new STm( settings ),
-	delay1 	= stm.calcDelay( 'gone.', false ),  // 600
+	delay1 	= stm.calcDelay( 'gone.', false ),  	// 600
 	delay1 	= stm.calcDelay( 'gone.' ),  		// 600
 	delay2 	= stm.calcDelay( 'gone.' );  		// 400 (see description below for explanation)
 ```
 
 ---------
 ## DESCRIPTION
----------
 
-Meant to be used with Readerly's other modules, this object is tricky, and very tangled up with the code that creates and uses it. The creator of a StringTime instance (stm) passes in a reference to an object which can contain these used properties:
+Meant to be used with Readerly's other modules, this object is tricky, and very tangled up with the code that creates and uses it. The creator of a `StringTime` instance (`stm`) passes in a reference to an object which can contain these used properties:
 
 Base delay to start with:
 
@@ -89,19 +86,16 @@ The functionality to add more delay modifiers after the fact hasn't been created
 
 ---------
 ## LICENSE
----------
 
 MIT
 
 ---------
 ## Issues
----------
 
 Issues reports welcome at [https://github.com/knod/string-time/issues](https://github.com/knod/string-time/issues).
 
 ---------
 ## Contributing
----------
 
 Pull requests welcome, but please test your code befor making a pull request.
 
@@ -123,8 +117,7 @@ npm test
 You can then run `npm test` whenever you want in order to make sure that the code passes all existing tests. If more tests are needed to support new functionality, please write them. Check out the `jasmine` API for more details on what you can do. If you're not sure how to write those tests, feel free to [file an issues](https://github.com/knod/string-time/issues)
 
 ---------
-##TODO
----------
+## TODO
 
 - Base an internal `baseDelay` on external `.wpm`, converting on the fly? Needs recalculating every time.
 - Build list of multipliers and testing functions then make that list modifiable
