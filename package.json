@@ -1,12 +1,14 @@
 {
-  "name": "ticker-text",
-  "version": "0.2.0",
+  "name": "string-time",
+  "version": "0.5.0",
   "description": "Calculates how long a string should stay visible using the characteristics of that string, corresponding millisecond values, and other data",
-  "main": "Ticker-Text.js",
-  "scripts": {},
+  "main": "dist/String-Time.js",
+  "scripts": {
+    "test": "jasmine"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/knod/ticker-text.git"
+    "url": "git+https://github.com/knod/string-time.git"
   },
   "keywords": [
     "accessibility",
@@ -21,9 +23,9 @@
   "author": "knod",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/knod/ticker-text/issues"
+    "url": "https://github.com/knod/string-time/issues"
   },
-  "homepage": "https://github.com/knod/ticker-text#readme",
+  "homepage": "https://github.com/knod/string-time#readme",
   "devDependencies": {
     "jasmine": "^2.5.3"
   }
